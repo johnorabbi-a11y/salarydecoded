@@ -14,20 +14,21 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="US Salary Calculator | SalaryDecoded">
   <meta name="twitter:description" content="Estimate US salary after federal tax and FICA, with selected state context.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/style.css">
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://salarydecoded.com/#organization","name":"SalaryDecoded","url":"https://salarydecoded.com/","description":"SalaryDecoded is an independent salary and take-home-pay calculation product."},{"@type":"WebSite","@id":"https://salarydecoded.com/#website","url":"https://salarydecoded.com/","name":"SalaryDecoded","publisher":{"@id":"https://salarydecoded.com/#organization"}},{"@type":"WebPage","@id":"https://salarydecoded.com/us/salary-calculator/#webpage","url":"https://salarydecoded.com/us/salary-calculator/","name":"US Salary Calculator | SalaryDecoded","isPartOf":{"@id":"https://salarydecoded.com/#website"}}]}</script>
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="/">SalaryDecoded</a>
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">SD</span><span>SalaryDecoded</span></a>
     <nav aria-label="Primary">
       <a href="/uk/">UK</a> <a href="/us/">US</a> <a href="/tools/salary-to-hourly/">Tools</a> <a href="/methodology/">Methodology</a>
     </nav>
   </header>
-  <main><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>US Salary Calculator</span></nav><section class="hero"><div><p class="eyebrow">Understand what your salary is really worth</p><h1>US Salary Calculator</h1><p class="lead">Use the calculator to estimate US take-home pay under transparent single-filer assumptions.</p></div></section><section class="calculator" data-calculator="salaryToHourly">
-    <h2>Try the calculator</h2>
+  <main><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>US Salary Calculator</span></nav><section class="hero"><div class="hero-copy"><p class="eyebrow">Understand what your salary is really worth</p><h1>US Salary Calculator</h1><p class="lead">Use the calculator to estimate US take-home pay under transparent single-filer assumptions.</p></div></section><section class="calculator app-surface calculator--salaryToHourly" data-calculator="salaryToHourly">
+    <div class="tool-heading"><p class="eyebrow">Interactive estimate</p><h2>Convert salary into usable pay figures</h2><p>Turn an annual salary into hourly, monthly and weekly equivalents for quick pay planning.</p></div>
     <div class="form-grid">
-      <label>Amount <input data-input="amount" type="number" value="60000" min="0" step="100"></label>
+      <label>Salary / starting amount <input data-input="amount" type="number" value="60000" min="0" step="100"></label>
       <label>Comparison amount <input data-input="compare" type="number" value="75000" min="0" step="100"></label>
       <label>Region <select data-input="region"><option value="uk">UK</option><option value="us">US</option></select></label>
       <label>Pension / retirement % <input data-input="pension" type="number" value="5" min="0" max="30" step="1"></label>
