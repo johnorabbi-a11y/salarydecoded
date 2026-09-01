@@ -1,0 +1,70 @@
+{
+  "pagesChecked": 121,
+  "highSimilarityThreshold": 0.86,
+  "highSimilarityPairs": 84,
+  "maxSimilarity": "1.000",
+  "examples": [
+    {
+      "file": "about/index.html",
+      "nearest": "disclaimer/index.html",
+      "similarity": "0.978"
+    },
+    {
+      "file": "accessibility/index.html",
+      "nearest": "disclaimer/index.html",
+      "similarity": "0.967"
+    },
+    {
+      "file": "comparisons/100000-vs-125000-uk/index.html",
+      "nearest": "comparisons/100000-vs-150000-us/index.html",
+      "similarity": "0.989"
+    },
+    {
+      "file": "comparisons/100000-vs-150000-us/index.html",
+      "nearest": "comparisons/50000-vs-75000-us/index.html",
+      "similarity": "1.000"
+    },
+    {
+      "file": "comparisons/40000-vs-50000-uk/index.html",
+      "nearest": "comparisons/75000-vs-90000-uk/index.html",
+      "similarity": "1.000"
+    },
+    {
+      "file": "comparisons/50000-vs-60000-uk/index.html",
+      "nearest": "comparisons/40000-vs-50000-uk/index.html",
+      "similarity": "0.888"
+    },
+    {
+      "file": "comparisons/50000-vs-75000-us/index.html",
+      "nearest": "comparisons/100000-vs-150000-us/index.html",
+      "similarity": "1.000"
+    },
+    {
+      "file": "comparisons/75000-vs-100000-us/index.html",
+      "nearest": "comparisons/100000-vs-150000-us/index.html",
+      "similarity": "0.864"
+    },
+    {
+      "file": "comparisons/75000-vs-90000-uk/index.html",
+      "nearest": "comparisons/40000-vs-50000-uk/index.html",
+      "similarity": "1.000"
+    },
+    {
+      "file": "disclaimer/index.html",
+      "nearest": "about/index.html",
+      "similarity": "0.978"
+    },
+    {
+      "file": "editorial-standards/index.html",
+      "nearest": "disclaimer/index.html",
+      "similarity": "0.978"
+    },
+    {
+      "file": "guides/salary-offer-comparison-checklist/index.html",
+      "nearest": "guides/uk-vs-us-take-home-pay/index.html",
+      "similarity": "0.943"
+    }
+  ],
+  "advisory": true,
+  "note": "This audit is a similarity warning report, not a blocking duplicate-signal test. Use scripts/audit-site.js for hard duplicate title, description, H1, canonical and crawl checks."
+}

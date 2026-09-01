@@ -4,8 +4,9 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const SITE = 'https://salarydecoded.com';
 
-const ukSalaries = [20000,25000,30000,35000,40000,45000,50000,60000,70000,75000,80000,90000,100000,125000,150000];
-const usSalaries = [30000,40000,50000,60000,75000,100000,125000,150000,200000,250000];
+const ukSalaries = [20000,22000,25000,28000,30000,32000,34000,35000,40000,45000,50000,55000,60000,65000,70000,75000,80000,85000,90000,95000,100000,110000,125000,150000,175000,200000];
+const usSalaries = [30000,40000,50000,60000,70000,75000,80000,90000,100000,120000,125000,150000,175000,200000,250000];
+const scotlandSalaries = [30000,35000,45000,50000,70000,90000,150000];
 const statePages = [
   ['california', 'California', 100000],
   ['california', 'California', 150000],
@@ -28,6 +29,47 @@ const tools = [
   ['tools/pay-rise-calculator','Pay Rise Calculator','Estimate how much extra take-home pay a raise may actually create.','payRise'],
   ['tools/salary-comparison','Salary Comparison Calculator','Compare two salary offers by gross, estimated net and monthly difference.','compare'],
   ['tools/bonus-calculator','Bonus Calculator','Estimate the take-home impact of a one-off bonus.','bonus'],
+  ['tools/pay-difference-calculator','Pay Difference Calculator','Compare the monthly and annual take-home difference between two salary amounts.','compare'],
+  ['tools/percentage-pay-rise-calculator','Percentage Pay Rise Calculator','Convert a percentage raise into gross and estimated take-home pay difference.','payRise'],
+  ['tools/monthly-salary-calculator','Monthly Salary Calculator','Turn annual salary into estimated monthly take-home pay for UK and US planning.','salaryToHourly'],
+  ['tools/weekly-salary-calculator','Weekly Salary Calculator','Convert annual salary into weekly and hourly equivalents before judging a pay offer.','salaryToHourly'],
+  ['tools/biweekly-pay-calculator','Biweekly Pay Calculator','Estimate annual salary as biweekly pay and compare it with monthly or weekly figures.','salaryToHourly'],
+  ['tools/overtime-impact-calculator','Overtime Impact Calculator','Model how extra hours can change gross pay, estimated take-home pay and real hourly value.','hourlyToSalary'],
+  ['tools/salary-increase-take-home-comparison','Salary Increase Take-Home Comparison','Compare a current salary and new salary using estimated net pay rather than gross pay alone.','compare'],
+];
+const guidePages = [
+  ['guides/biweekly-take-home-pay','Biweekly Take-Home Pay Explained','Understand biweekly pay from annual salary, including why it differs from monthly and weekly estimates.','biweekly'],
+  ['guides/tax-on-salary-uk','Tax on Salary UK','A plain-English guide to how UK Income Tax and National Insurance reduce gross salary.','tax'],
+  ['guides/uk-salary-bands-explained','UK Salary Bands Explained','How personal allowance, basic rate, higher rate and additional rate thresholds affect take-home pay.','thresholds'],
+  ['guides/pension-impact-on-take-home-pay','Pension Impact on Take-Home Pay','How pension contributions can reduce immediate take-home pay while changing the salary calculation.','pension'],
+  ['guides/student-loan-take-home-pay','Student Loan Take-Home Pay','How UK student loan plans can reduce monthly salary after tax and National Insurance.','student'],
+  ['guides/effective-tax-rate-explained','Effective Tax Rate Explained','Why effective tax rate is usually more useful than a headline tax band for salary planning.','effective'],
+  ['guides/marginal-tax-rate-explained','Marginal Tax Rate Explained','How the next pound of salary can be deducted differently from your average pay.','marginal'],
+  ['guides/salary-thresholds-uk','Important UK Salary Thresholds','Salary thresholds that can materially change take-home pay, pension choices and student-loan deductions.','thresholds'],
+  ['guides/how-to-use-a-salary-calculator','How to Use a Salary Calculator','How to read gross, net, monthly, weekly and hourly salary estimates without over-trusting them.','calculator'],
+  ['guides/pay-rise-after-tax','Pay Rise After Tax Guide','How to judge a pay rise by monthly take-home difference rather than headline salary.','payrise'],
+  ['guides/bonus-tax-guide','Bonus Tax Guide','Why one-off bonus pay can feel different from a normal salary increase after deductions.','bonus'],
+  ['guides/gross-pay-vs-net-pay','Gross Pay vs Net Pay','The practical difference between salary on paper and money available after payroll deductions.','grossnet'],
+  ['guides/annual-to-monthly-salary','Annual to Monthly Salary','How annual salary translates into monthly pay and why payslips may not divide neatly by twelve.','monthly'],
+  ['guides/annual-to-weekly-salary','Annual to Weekly Salary','How to convert annual salary into weekly pay without confusing gross and take-home figures.','weekly'],
+  ['guides/hourly-rate-from-salary','Hourly Rate from Salary','How to turn a salary into an hourly figure and why working hours matter.','hourly'],
+  ['guides/take-home-pay-checklist','Take-Home Pay Checklist','A practical checklist for reviewing salary, pension, student loans, bonuses and tax assumptions.','checklist'],
+  ['guides/salary-offer-comparison-checklist','Salary Offer Comparison Checklist','Compare two job offers using take-home pay, pay frequency, pension and bonus context.','comparison'],
+  ['guides/why-take-home-pay-differs','Why Take-Home Pay Differs','Why two people on the same salary can receive different net pay.','differences'],
+  ['guides/high-salary-tax-traps','High Salary Tax Traps','High-income salary thresholds that can make extra pay feel smaller than expected.','highsalary'],
+  ['guides/low-salary-tax-and-ni','Low Salary Tax and NI','How lower salary levels interact with personal allowance and National Insurance thresholds.','lowsalary'],
+  ['guides/uk-vs-us-take-home-pay','UK vs US Take-Home Pay','Why UK and US salary calculators use different deduction models and assumptions.','comparison'],
+  ['guides/calculator-assumptions-guide','Calculator Assumptions Guide','Which assumptions matter most when comparing salary calculator results.','methodology'],
+];
+const comparisonPages = [
+  [40000,50000,'GBP','uk'],
+  [50000,60000,'GBP','uk'],
+  [70000,75000,'GBP','uk'],
+  [75000,90000,'GBP','uk'],
+  [100000,125000,'GBP','uk'],
+  [50000,75000,'USD','us'],
+  [75000,100000,'USD','us'],
+  [100000,150000,'USD','us'],
 ];
 const trust = [
   ['about','About SalaryDecoded','What SalaryDecoded is for, who it helps and how to interpret its estimates.'],
@@ -71,7 +113,19 @@ function ukCalc(salary, pensionPct = 0, studentPlan = 'none') {
   const studentThresholds = { plan1: 26065, plan2: 28470, plan4: 32745, plan5: 25000, postgraduate: 21000 };
   const student = studentPlan === 'none' ? 0 : Math.max(0, salary - studentThresholds[studentPlan]) * (studentPlan === 'postgraduate' ? 0.06 : 0.09);
   const net = salary - incomeTax - ni - pension - student;
-  return { gross: salary, pension, allowance, taxable, incomeTax, ni, student, net, monthly: net/12, weekly: net/52, hourly: salary/(37.5*52), effective: (salary-net)/salary };
+  return { gross: salary, pension, allowance, taxable, incomeTax, ni, student, net, monthly: net/12, biweekly: net/26, weekly: net/52, hourly: salary/(37.5*52), effective: (salary-net)/salary };
+}
+function scotlandCalc(salary, pensionPct = 0, studentPlan = 'none') {
+  const pension = salary * pensionPct / 100;
+  const taxableIncome = Math.max(0, salary - pension);
+  const allowance = taxableIncome <= 100000 ? 12570 : Math.max(0, 12570 - (taxableIncome - 100000) / 2);
+  const taxable = Math.max(0, taxableIncome - allowance);
+  const incomeTax = taxBand(taxable, [[0,2827,0.19],[2827,14921,0.20],[14921,31092,0.21],[31092,62430,0.42],[62430,112570,0.45],[112570,null,0.48]]);
+  const ni = Math.max(0, Math.min(salary,50270)-12570)*0.08 + Math.max(0, salary-50270)*0.02;
+  const studentThresholds = { plan1: 26065, plan2: 28470, plan4: 32745, plan5: 25000, postgraduate: 21000 };
+  const student = studentPlan === 'none' ? 0 : Math.max(0, salary - studentThresholds[studentPlan]) * (studentPlan === 'postgraduate' ? 0.06 : 0.09);
+  const net = salary - incomeTax - ni - pension - student;
+  return { gross: salary, pension, allowance, taxable, incomeTax, ni, student, net, monthly: net/12, biweekly: net/26, weekly: net/52, hourly: salary/(37.5*52), effective: (salary-net)/salary };
 }
 const federalSingle2025 = [[0,11925,0.10],[11925,48475,0.12],[48475,103350,0.22],[103350,197300,0.24],[197300,250525,0.32],[250525,626350,0.35],[626350,null,0.37]];
 const stateModels = {
@@ -187,17 +241,18 @@ function calcBox(kind) {
   </section>`;
 }
 function home() {
-  const popular = [...ukSalaries.slice(2,9).map(s=>[`uk/${s}-salary`, `${money(s,'GBP')} UK salary`]), ...usSalaries.slice(2,8).map(s=>[`us/${s}-salary`, `${money(s,'USD')} US salary`])];
+  const popular = [...ukSalaries.filter(s => [30000,34000,50000,70000,75000,90000,100000].includes(s)).map(s=>[`uk/${s}-salary`, `${money(s,'GBP')} UK salary`]), ...usSalaries.filter(s => [50000,70000,75000,90000,100000,150000].includes(s)).map(s=>[`us/${s}-salary`, `${money(s,'USD')} US salary`])];
   return layout({ route:'', title:'SalaryDecoded | Salary and Take-Home Pay Calculators', description:'Understand salary, take-home pay, hourly equivalents, pay rises and tax deductions with clear UK and US salary calculators.', body:
     `<section class="home-hero"><div class="hero-copy"><p class="eyebrow">SalaryDecoded</p><h1>Understand what your salary is really worth.</h1><p class="lead">Estimate take-home pay, monthly income, weekly pay and hourly equivalents with clear UK and US salary calculations.</p><p class="actions">${a('uk/salary-calculator','Start with UK salary')} ${a('us/salary-calculator','Start with US salary')}</p></div>${calcBox('salaryToHourly')}</section>` +
     `<section class="section"><h2>Start with the answer, then inspect the calculation</h2><p>SalaryDecoded is built around the calculation first. Each guide shows gross pay, estimated deductions, take-home pay and the assumptions used, then routes you to the next useful comparison.</p>${cards([['uk','UK salary tools','Income Tax, National Insurance, pension examples and selected salary guides.'],['us','US salary tools','Federal tax, FICA, selected state examples and national salary guides.'],['tools/salary-comparison','Decision tools','Compare salaries, pay rises, bonuses and hourly equivalents.']])}</section>` +
     `<section class="section"><h2>Popular salary examples</h2><div class="link-cloud">${popular.map(([r,l])=>a(r,l)).join('')}</div></section>` +
     `<section class="section"><h2>Calculation tools</h2>${cards(tools.map(([r,t,d])=>[r,t,d]))}</section>` +
+    `<section class="section"><h2>New salary decision routes</h2>${cards([['guides','Salary guides','Tax, pay-period, pay-rise and deduction explainers.'],['uk/scotland','Scotland salary after tax','Scottish income-tax salary examples with separate calculation context.'],['tools/pay-difference-calculator','Pay difference calculator','Compare two salary outcomes by estimated take-home pay.']])}</section>` +
     `<section class="section"><h2>Trust and assumptions</h2><p>Every result is an estimate, not a payslip replacement. Read the ${a('methodology','methodology')} and ${a('tax-assumptions','tax assumptions')} before using results for decisions.</p></section>` +
     faq([
       ['What does SalaryDecoded calculate?','It estimates gross salary, tax deductions, take-home pay, monthly pay, weekly pay and hourly equivalents for selected UK and US examples.'],
       ['Is the calculator exact?','No. It is an educational estimate based on documented assumptions and simplified scenarios. Actual payroll can differ.'],
-      ['Why are there only selected salary pages?','V1 publishes only useful cohorts with clear independent intent, instead of generating every salary permutation.']
+      ['Why are there only selected salary pages?','SalaryDecoded publishes controlled cohorts with clear independent intent, instead of generating every salary permutation.']
     ], '')
   });
 }
@@ -231,9 +286,9 @@ function ukSalaryPage(salary) {
       ['Effective rate', pct(c.effective), 'deductions / gross']
     ], 'UK V1 estimate using England, Wales and Northern Ireland Income Tax and employee National Insurance assumptions.') +
     deductionBar([{ label:'Take-home', value:c.net, class:'net' }, { label:'Income Tax', value:c.incomeTax, class:'tax' }, { label:'NI', value:c.ni, class:'ni' }]) +
-    `<section class="answer"><h2>Direct answer</h2><p>On the standard UK V1 assumptions, ${money(salary,'GBP')} gives about <strong>${money(c.monthly,'GBP')} per month</strong> or <strong>${money(c.weekly,'GBP')} per week</strong> after Income Tax and employee National Insurance.</p></section>` +
+    `<section class="answer"><h2>Direct answer</h2><p>On the standard UK V1 assumptions, ${money(salary,'GBP')} gives about <strong>${money(c.monthly,'GBP')} per month</strong>, <strong>${money(c.biweekly,'GBP')} every two weeks</strong> or <strong>${money(c.weekly,'GBP')} per week</strong> after Income Tax and employee National Insurance.</p></section>` +
     `<section class="section"><h2>Your ${money(salary,'GBP')} salary breakdown</h2>${table([['Item','Annual estimate'],['Gross salary',money(c.gross,'GBP')],['Income Tax',money(c.incomeTax,'GBP')],['National Insurance',money(c.ni,'GBP')],['Estimated take-home',money(c.net,'GBP')],['Effective deduction rate',pct(c.effective)]])}<p>${threshold}</p></section>` +
-    `<section class="section"><h2>Monthly, weekly and hourly view</h2>${table([['Period','Gross equivalent','Estimated net'],['Annual',money(c.gross,'GBP'),money(c.net,'GBP')],['Monthly',money(c.gross/12,'GBP'),money(c.monthly,'GBP')],['Weekly',money(c.gross/52,'GBP'),money(c.weekly,'GBP')],['Hourly equivalent',money(c.hourly,'GBP'),'Based on 37.5 hours/week']])}</section>` +
+    `<section class="section"><h2>Monthly, biweekly, weekly and hourly view</h2>${table([['Period','Gross equivalent','Estimated net'],['Annual',money(c.gross,'GBP'),money(c.net,'GBP')],['Monthly',money(c.gross/12,'GBP'),money(c.monthly,'GBP')],['Biweekly',money(c.gross/26,'GBP'),money(c.biweekly,'GBP')],['Weekly',money(c.gross/52,'GBP'),money(c.weekly,'GBP')],['Hourly equivalent',money(c.hourly,'GBP'),'Based on 37.5 hours/week']])}</section>` +
     `<section class="section"><h2>Pension scenarios</h2>${table([['Pension choice','Take-home estimate','What changes'],['0%',money(c.net,'GBP'),'No pension deduction modelled'],['5%',money(p5.net,'GBP'),`${money(p5.pension,'GBP')} gross pension contribution`],['8%',money(ukCalc(salary,8).net,'GBP'),'Higher contribution, lower immediate take-home'],['10%',money(ukCalc(salary,10).net,'GBP'),'Useful for sensitivity checking']])}</section>` +
     `<section class="section"><h2>Nearby salary comparison</h2>${table([['Salary','Estimated take-home','Difference'],...nearby])}<p>The next ${money(5000,'GBP')} of gross pay is estimated to add about ${money(marginal.net-c.net,'GBP')} of take-home pay.</p></section>` +
     `<section class="section"><h2>Related calculations</h2><p>${a('uk/salary-calculator','Use the UK calculator')}, compare with ${a('tools/pay-rise-calculator','a pay rise')}, or convert this salary using the ${a('tools/salary-to-hourly','salary to hourly calculator')}.</p></section>` +
@@ -242,6 +297,36 @@ function ukSalaryPage(salary) {
       ['Does pension change the result?','Yes. Pension contributions reduce immediate take-home pay and may also change taxable pay depending on the arrangement.'],
       ['Does this include Scotland?','No. V1 UK salary pages use the England, Wales and Northern Ireland Income Tax structure unless a page says otherwise.']
     ], `uk/${salary}-salary`)
+  });
+}
+function scotlandSalaryPage(salary) {
+  const sc = scotlandCalc(salary, 0);
+  const standard = ukCalc(salary, 0);
+  const p5 = scotlandCalc(salary, 5);
+  const nearby = scotlandSalaries.filter(s => s !== salary).sort((a,b) => Math.abs(a - salary) - Math.abs(b - salary)).slice(0,3);
+  const threshold = salary >= 75000 ? 'At this level, Scottish higher and advanced-rate structure becomes central to the take-home-pay interpretation.' : salary >= 43662 ? 'This salary moves beyond the Scottish intermediate band, so the next slice of pay is affected more sharply.' : 'This salary is mainly shaped by the starter, basic and intermediate Scottish bands, plus UK-wide employee National Insurance.';
+  return layout({ route:`uk/scotland/${salary}-salary`, title:`${money(salary,'GBP')} After Tax Scotland | SalaryDecoded`, description:`Estimate ${money(salary,'GBP')} after tax in Scotland, including Scottish Income Tax, National Insurance, monthly pay and biweekly pay.`, body:
+    crumbs([['','Home'],['uk','UK'],['uk/scotland','Scotland'],[`uk/scotland/${salary}-salary`,`${money(salary,'GBP')} salary`]]) +
+    hero(`${money(salary,'GBP')} After Tax Scotland`, `A ${money(salary,'GBP')} gross salary in Scotland is estimated at about ${money(sc.net,'GBP')} take-home pay before optional pension or student-loan deductions.`) +
+    resultPanel([
+      ['Gross salary', money(sc.gross,'GBP'), 'annual'],
+      ['Take-home pay', money(sc.net,'GBP'), 'estimated annual net'],
+      ['Monthly', money(sc.monthly,'GBP'), 'after Scottish tax and NI'],
+      ['Biweekly', money(sc.biweekly,'GBP'), '26 pay periods'],
+      ['Scottish Income Tax', money(sc.incomeTax,'GBP'), 'annual estimate'],
+      ['National Insurance', money(sc.ni,'GBP'), 'UK-wide employee NI'],
+      ['Effective rate', pct(sc.effective), 'deductions / gross']
+    ], 'Scotland estimate using Scottish Income Tax bands and UK-wide employee National Insurance assumptions.') +
+    deductionBar([{ label:'Take-home', value:sc.net, class:'net' }, { label:'Scottish tax', value:sc.incomeTax, class:'tax' }, { label:'NI', value:sc.ni, class:'ni' }]) +
+    `<section class="answer"><h2>Direct answer</h2><p>On the Scotland V1 assumptions, ${money(salary,'GBP')} gives about <strong>${money(sc.monthly,'GBP')} per month</strong>, <strong>${money(sc.biweekly,'GBP')} every two weeks</strong> or <strong>${money(sc.weekly,'GBP')} per week</strong> after Scottish Income Tax and employee National Insurance.</p></section>` +
+    `<section class="section"><h2>Why Scotland is different</h2><p>${threshold}</p>${table([['Scenario','Estimated take-home','Difference from standard UK page'],['Scotland',money(sc.net,'GBP'),'Current page'],['Standard UK page',money(standard.net,'GBP'),money(standard.net - sc.net,'GBP')]])}</section>` +
+    `<section class="section"><h2>Pension and pay-period view</h2>${table([['Scenario','Monthly take-home','Biweekly take-home','Annual net'],['No pension',money(sc.monthly,'GBP'),money(sc.biweekly,'GBP'),money(sc.net,'GBP')],['5% pension',money(p5.monthly,'GBP'),money(p5.biweekly,'GBP'),money(p5.net,'GBP')],['10% pension',money(scotlandCalc(salary,10).monthly,'GBP'),money(scotlandCalc(salary,10).biweekly,'GBP'),money(scotlandCalc(salary,10).net,'GBP')]])}</section>` +
+    `<section class="section"><h2>Nearby Scottish salary routes</h2><div class="link-cloud">${nearby.map(s=>a(`uk/scotland/${s}-salary`,`${money(s,'GBP')} Scotland`)).join('')} ${a('uk/salary-calculator','UK salary calculator')} ${a('guides/uk-salary-bands-explained','UK salary bands')}</div></section>` +
+    faq([
+      [`What is ${money(salary,'GBP')} after tax in Scotland?`, `The Scotland V1 estimate is about ${money(sc.net,'GBP')} per year after Scottish Income Tax and employee National Insurance.`],
+      ['Why does this differ from the UK salary page?','Scotland has different Income Tax bands and rates, while National Insurance remains UK-wide.'],
+      ['Is this exact payroll advice?','No. It is an educational estimate based on published assumptions and simplified inputs.']
+    ], `uk/scotland/${salary}-salary`)
   });
 }
 function usSalaryPage(salary, stateSlug = null, stateName = null) {
@@ -288,6 +373,106 @@ function toolPage(route, title, desc, kind) {
     ], route)
   });
 }
+function guidePage(route, title, desc, topic) {
+  const links = {
+    biweekly: [['tools/biweekly-pay-calculator','Biweekly pay calculator'],['uk/75000-salary','£75,000 salary example']],
+    tax: [['uk/34000-salary','£34,000 salary tax example'],['uk/salary-calculator','UK salary calculator']],
+    thresholds: [['uk/60000-salary','£60,000 threshold example'],['uk/125000-salary','£125,000 taper example']],
+    pension: [['uk/50000-salary','£50,000 pension scenarios'],['tools/pay-rise-calculator','Pay rise calculator']],
+    student: [['uk/30000-salary','£30,000 salary example'],['guides/take-home-pay-checklist','Take-home pay checklist']],
+    effective: [['uk/90000-salary','£90,000 salary example'],['us/100000-salary','$100,000 US salary example']],
+    marginal: [['uk/125000-salary','UK allowance taper example'],['tools/salary-increase-take-home-comparison','Salary increase comparison']],
+    calculator: [['tools/monthly-salary-calculator','Monthly salary calculator'],['tools/weekly-salary-calculator','Weekly salary calculator']],
+    payrise: [['tools/percentage-pay-rise-calculator','Percentage pay rise calculator'],['tools/pay-difference-calculator','Pay difference calculator']],
+    bonus: [['tools/bonus-calculator','Bonus calculator'],['guides/gross-pay-vs-net-pay','Gross pay vs net pay']],
+    monthly: [['tools/monthly-salary-calculator','Monthly salary calculator'],['uk/monthly-take-home-pay','Monthly take-home hub']],
+    weekly: [['tools/weekly-salary-calculator','Weekly salary calculator'],['uk/weekly-take-home-pay','Weekly take-home hub']],
+    hourly: [['tools/salary-to-hourly','Salary to hourly calculator'],['tools/hourly-to-salary','Hourly to salary calculator']],
+    comparison: [['tools/salary-comparison','Salary comparison calculator'],['comparisons/50000-vs-60000-uk','£50k vs £60k UK']],
+    highsalary: [['uk/100000-salary','£100,000 salary example'],['uk/150000-salary','£150,000 salary example']],
+    lowsalary: [['uk/22000-salary','£22,000 salary example'],['uk/28000-salary','£28,000 salary example']],
+    differences: [['guides/calculator-assumptions-guide','Calculator assumptions'],['tax-assumptions','Tax assumptions']],
+    grossnet: [['uk/salary-calculator','UK salary calculator'],['us/salary-calculator','US salary calculator']],
+    methodology: [['methodology','Methodology'],['tax-assumptions','Tax assumptions']]
+  }[topic] || [['uk/salary-calculator','UK salary calculator'],['methodology','Methodology']];
+  const detail = {
+    biweekly: ['Biweekly pay is usually one twenty-sixth of annual pay before deductions. It does not equal half a monthly payslip, which is why annual, monthly and biweekly views can feel inconsistent.', [['Annual salary','Divided by 26 for a simple gross biweekly figure'],['Take-home pay','Estimated annually, then divided by 26'],['Useful caution','Actual payroll dates and deductions can change individual payslips']]],
+    tax: ['Tax on salary is not a single flat deduction. Personal allowance, tax bands and National Insurance each apply to different slices of pay.', [['Personal allowance','Reduces taxable income before Income Tax'],['Income Tax bands','Apply progressively to taxable salary'],['National Insurance','Calculated separately from Income Tax']]],
+    thresholds: ['Thresholds matter because the next part of salary can be taxed differently from the first part. A salary page should explain the threshold context, not just the final net number.', [['£12,570','Personal allowance reference point'],['£50,270','Higher-rate boundary for standard UK pages'],['£100,000','Personal allowance taper begins']]],
+    pension: ['Pension contributions reduce immediate take-home pay, but they are not the same as tax. SalaryDecoded treats them as a planning scenario, not a recommendation.', [['Lower immediate pay','More salary is diverted before reaching the bank account'],['Tax interaction','Some arrangements reduce taxable pay'],['Comparison use','Useful when judging a pay rise or benefits package']]],
+    student: ['Student loan deductions can make two people on the same salary take home different amounts. The plan type and threshold matter more than the salary headline alone.', [['Plan threshold','Repayments usually begin above a plan-specific threshold'],['Deduction rate','Most plans use a percentage of income above the threshold'],['Payslip impact','Monthly deductions can vary with pay timing']]],
+    effective: ['Effective tax rate shows total deductions as a share of gross salary. It is often easier to understand than the marginal rate because it describes the whole salary.', [['Gross salary','Starting amount before deductions'],['Total deductions','Tax, NI/FICA and modelled deductions'],['Effective rate','Total deductions divided by gross salary']]],
+    marginal: ['Marginal rate is about the next slice of income. It helps explain why a raise can feel smaller than expected even when total take-home pay still rises.', [['Average rate','Across the whole salary'],['Marginal rate','On the next slice of income'],['Planning use','Useful for raises, bonuses and threshold salaries']]],
+    calculator: ['A salary calculator is most useful when you know what it assumes. Region, pay period, pension, student loans and state tax can change the answer.', [['Input quality','Use annual gross salary where possible'],['Output reading','Compare annual, monthly and weekly views'],['Assumption check','Review tax assumptions before making decisions']]],
+    payrise: ['A pay rise should be judged by the take-home difference as well as the headline gross increase. Monthly net change is usually the clearest decision number.', [['Current salary','Baseline estimate'],['New salary','Post-raise estimate'],['Decision number','Monthly net difference']]],
+    bonus: ['Bonus pay can feel different from normal salary because it is paid in one period, but the useful comparison is still the extra estimated take-home amount.', [['Base salary','Normal annual income'],['Bonus amount','One-off extra gross pay'],['Retained amount','Difference between salary alone and salary plus bonus']]],
+    monthly: ['Monthly salary estimates are practical for rent, bills and regular commitments. They should still be tied back to annual gross salary and annual net pay.', [['Annual gross','Contract salary'],['Annual net','Estimated take-home across the year'],['Monthly net','Annual net divided by 12 for planning']]],
+    weekly: ['Weekly salary estimates are useful for shift comparisons and short-term budgeting. They can mislead if confused with hourly or daily rates.', [['Annual gross','Starting salary'],['Weekly gross','Annual gross divided by 52'],['Weekly net','Estimated annual net divided by 52']]],
+    hourly: ['Hourly value depends on hours. A salary based on 37.5 hours a week and the same salary based on 45 hours a week do not represent the same time value.', [['Annual salary','Gross pay before deductions'],['Hours assumption','The divisor used for hourly conversion'],['Real value','Affected by unpaid overtime and commuting time']]],
+    comparison: ['Salary comparisons should isolate the difference that matters: gross increase, estimated net increase and monthly budget impact.', [['Offer A','Current or lower salary'],['Offer B','New or higher salary'],['Net difference','Estimated extra take-home pay']]],
+    highsalary: ['High salaries can trigger sharper threshold effects, especially where allowances taper or additional rates begin. The result should be interpreted with caution.', [['Threshold pressure','Higher slices of income can face higher deduction rates'],['Monthly impact','Still the key planning number'],['Assumptions','Especially important at high income']]],
+    lowsalary: ['Lower salary pages are often shaped by personal allowance and National Insurance thresholds. Small changes can matter when income is close to deduction boundaries.', [['Allowance effect','Can remove some or all Income Tax'],['NI threshold','Can change employee NI deductions'],['Budget use','Monthly net is often more useful than annual gross']]],
+    differences: ['Two people on the same gross salary can have different take-home pay because payroll is personal to deductions, location and timing.', [['Location','UK/US/state or Scotland assumptions'],['Personal deductions','Pension, student loans or benefits'],['Payroll timing','Monthly, weekly or irregular payments']]],
+    grossnet: ['Gross pay is the salary headline. Net pay is the amount left after modelled deductions. Salary decisions usually need both.', [['Gross pay','Before deductions'],['Net pay','After modelled deductions'],['Useful comparison','Net monthly difference']]],
+    methodology: ['Assumptions are the boundary around every calculator result. If an assumption does not match your situation, the estimate should be treated as directional only.', [['Tax year','Defines rates and thresholds'],['Filing/location model','Controls which deductions apply'],['Simplification','Keeps pages understandable but not exact']]]
+  }[topic] || ['This guide explains how to interpret salary calculator results cautiously.', [['Concept','Why it matters'],['Estimate','Use as a planning figure'],['Assumptions','Check before decisions']]];
+  const examples = [
+    ['Salary input', 'A gross salary is the starting point, not the amount available to spend.'],
+    ['Deductions', 'Income Tax, National Insurance, FICA, pension, student loans or state tax can change the net result.'],
+    ['Pay period', 'Monthly, weekly and biweekly figures are useful planning views, but real payroll dates can vary.'],
+    ['Assumptions', 'A calculator result should be read alongside the tax assumptions and methodology.']
+  ];
+  return layout({ route, title:`${title} | SalaryDecoded`, description:desc, body:
+    crumbs([['','Home'],['guides','Guides'],[route,title]]) +
+    hero(title, desc) +
+    `<section class="answer"><h2>Direct answer</h2><p>${detail[0]}</p></section>` +
+    `<section class="section"><h2>How to use this guide</h2><p>This page supports SalaryDecoded's calculator-led pages by explaining a specific salary decision or payroll concept in more detail. Use it to interpret results, not as personal tax or financial advice.</p>${table([['Concept','How to read it'],...detail[1]])}</section>` +
+    `<section class="section"><h2>Worked planning example</h2><p>For a ${money(50000,'GBP')} UK salary, the same gross number can look different when shown annually, monthly, weekly or biweekly. Pension contributions, student-loan plan and payroll timing can then move the final figure again.</p>${table([['Question','Useful route'],['What is my net salary?',a('uk/50000-salary','£50,000 UK salary page')],['What changes after a raise?',a('tools/pay-rise-calculator','Pay rise calculator')],['How do I compare two offers?',a('tools/salary-comparison','Salary comparison calculator')]])}</section>` +
+    `<section class="section"><h2>Related salary routes</h2><div class="link-cloud">${links.map(([r,l])=>a(r,l)).join('')} ${a('methodology','Methodology')} ${a('tax-assumptions','Tax assumptions')}</div></section>` +
+    faq([
+      ['Is this personal tax advice?','No. SalaryDecoded is educational and uses simplified assumptions.'],
+      ['Should I use annual or monthly pay?','Use annual pay to understand the salary contract and monthly pay to understand household budget impact.'],
+      ['Why might my payslip differ?','Payroll frequency, tax code, filing status, local taxes, pension, student loans and benefits can all change the final result.']
+    ], route)
+  });
+}
+function guideHubPage() {
+  return hub('guides','Salary and Take-Home Pay Guides | SalaryDecoded','Educational guides for salary, tax, pay-period and compensation decisions.','Salary and Take-Home Pay Guides','Use these guides to interpret calculator results and choose the right salary route.', `<section class="section"><h2>Guide library</h2>${cards(guidePages.map(([r,t,d])=>[r,t,d]))}</section><section class="section"><h2>Related comparison pages</h2>${cards(comparisonPages.map(([a1,b1,country,scope])=>[comparisonRoute(a1,b1,country,scope),comparisonTitle(a1,b1,country,scope),'Compare the estimated take-home difference between two salary points.']))}</section>`);
+}
+function comparisonRoute(aSalary, bSalary, currency, scope) {
+  return `comparisons/${aSalary}-vs-${bSalary}-${scope}`;
+}
+function comparisonTitle(aSalary, bSalary, currency, scope) {
+  return `${money(aSalary,currency)} vs ${money(bSalary,currency)} ${scope.toUpperCase()} Salary`;
+}
+function comparisonPage(aSalary, bSalary, currency, scope) {
+  const calc = scope === 'uk' ? ukCalc : usCalc;
+  const aCalc = calc(aSalary);
+  const bCalc = calc(bSalary);
+  const route = comparisonRoute(aSalary,bSalary,currency,scope);
+  const title = comparisonTitle(aSalary,bSalary,currency,scope);
+  const spread = bSalary - aSalary;
+  const context = spread <= 5000 ? 'This is a narrow salary comparison, so the decision may depend heavily on commuting costs, hours, pension and job security rather than the headline increase alone.' :
+    spread <= 15000 ? 'This is a meaningful job-offer or pay-rise comparison where monthly take-home difference is usually more useful than the annual gross gap.' :
+    'This is a larger salary jump, so tax bands and payroll deductions become important when judging how much of the increase actually reaches take-home pay.';
+  const thresholdContext = scope === 'uk' && (aSalary < 50270 && bSalary >= 50270) ? 'The comparison crosses the standard UK higher-rate threshold, so part of the increase is treated differently from the lower salary.' :
+    scope === 'uk' && (aSalary < 100000 && bSalary >= 100000) ? 'The comparison approaches or crosses the UK personal allowance taper area, which can make the marginal result feel sharper.' :
+    scope === 'us' && (aSalary < 100000 && bSalary >= 100000) ? 'The comparison moves into a six-figure US salary range, where federal brackets and FICA remain central to the estimate.' :
+    'The comparison is still an estimate: the useful output is the net difference, not a promise about payroll.';
+  return layout({ route, title:`${title} | SalaryDecoded`, description:`Compare ${money(aSalary,currency)} and ${money(bSalary,currency)} by estimated take-home pay, monthly difference and pay-period impact.`, body:
+    crumbs([['','Home'],['guides','Guides'],[route,title]]) +
+    hero(title, `Compare ${money(aSalary,currency)} and ${money(bSalary,currency)} using estimated annual, monthly, biweekly and weekly take-home pay.`) +
+    `<section class="answer"><h2>Direct answer</h2><p>The higher salary is estimated to add about <strong>${money(bCalc.net - aCalc.net,currency)} per year</strong>, or <strong>${money((bCalc.net - aCalc.net)/12,currency)} per month</strong>, after modelled deductions.</p></section>` +
+    `<section class="section"><h2>Comparison table</h2>${table([['Salary','Estimated annual net','Monthly net','Weekly net','Effective deduction rate'],[money(aSalary,currency),money(aCalc.net,currency),money(aCalc.monthly,currency),money(aCalc.weekly,currency),pct(aCalc.effective)],[money(bSalary,currency),money(bCalc.net,currency),money(bCalc.monthly,currency),money(bCalc.weekly,currency),pct(bCalc.effective)]])}</section>` +
+    `<section class="section"><h2>What changes in practice</h2><p>${context}</p><p>${thresholdContext}</p>${table([['Difference view','Estimated amount'],['Gross annual difference',money(spread,currency)],['Net annual difference',money(bCalc.net-aCalc.net,currency)],['Net monthly difference',money((bCalc.net-aCalc.net)/12,currency)],['Net weekly difference',money((bCalc.net-aCalc.net)/52,currency)]])}</section>` +
+    `<section class="section"><h2>Related calculators</h2><div class="link-cloud">${a(scope === 'uk' ? `uk/${aSalary}-salary` : `us/${aSalary}-salary`,`${money(aSalary,currency)} salary page`)} ${a(scope === 'uk' ? `uk/${bSalary}-salary` : `us/${bSalary}-salary`,`${money(bSalary,currency)} salary page`)} ${a('tools/salary-comparison','Salary comparison calculator')} ${a('tools/pay-difference-calculator','Pay difference calculator')}</div></section>` +
+    faq([
+      ['Is the higher salary always better?','Not automatically. Commute, hours, pension, benefits and risk can matter as much as the monthly net difference.'],
+      ['Why is the net difference lower than the gross difference?','Extra income is also subject to tax and payroll deductions under the modelled assumptions.'],
+      ['Can real payroll differ?','Yes. The page is an educational estimate, not a payslip forecast.']
+    ], route)
+  });
+}
 function trustPage(route, title, desc) {
   const extra = route === 'tax-assumptions' ? `<p>UK V1 uses 2026/27 England, Wales and Northern Ireland Income Tax and Class 1 employee National Insurance assumptions. US V1 uses 2025 federal single-filer brackets, the 2025 standard deduction, employee FICA rates and selected simplified state models.</p>` : `<p>SalaryDecoded favours transparent, calculation-led pages. The site avoids publishing a page unless it has a clear independent purpose and a stable route from relevant hubs.</p>`;
   return layout({ route, title:`${title} | SalaryDecoded`, description:desc, body:
@@ -315,13 +500,15 @@ function generate() {
   const pages = [];
   const add = (route, html) => { pages.push(route); write(fileFor(route), html); };
   add('', home());
-  add('uk', hub('uk','UK Salary and Take-Home Pay | SalaryDecoded','UK salary calculators, salary guides and take-home-pay explanations using transparent assumptions.','UK Salary and Take-Home Pay','Start with UK gross salary, then inspect estimated Income Tax, National Insurance, pension scenarios and pay-period equivalents.', `<section class="section"><h2>UK calculator routes</h2>${cards([['uk/salary-calculator','UK salary calculator','Interactive UK take-home-pay estimate.'],['uk/salary-guides','UK salary guides','Selected salary examples from &pound;20,000 to &pound;150,000.'],['uk/monthly-take-home-pay','Monthly take-home pay','Understand annual-to-monthly salary conversion.'],['uk/weekly-take-home-pay','Weekly take-home pay','Convert annual salary into weekly planning numbers.']])}</section>`));
-  add('uk/salary-calculator', hub('uk/salary-calculator','UK Salary Calculator | SalaryDecoded','Estimate UK salary after tax, including Income Tax, National Insurance and pension contribution examples.','UK Salary Calculator','Use the calculator for a fast UK take-home-pay estimate, then compare against selected salary guide pages.', calcBox('salaryToHourly') + `<section class="section"><h2>Selected salary guides</h2><div class="link-cloud">${ukSalaries.map(s=>a(`uk/${s}-salary`,money(s,'GBP'))).join('')}</div></section>`));
+  add('uk', hub('uk','UK Salary and Take-Home Pay | SalaryDecoded','UK salary calculators, salary guides, Scottish salary pages and take-home-pay explanations using transparent assumptions.','UK Salary and Take-Home Pay','Start with UK gross salary, then inspect estimated Income Tax, National Insurance, pension scenarios and pay-period equivalents.', `<section class="section"><h2>UK calculator routes</h2>${cards([['uk/salary-calculator','UK salary calculator','Interactive UK take-home-pay estimate.'],['uk/salary-guides','UK salary guides','Selected salary examples from &pound;20,000 to &pound;200,000.'],['uk/scotland','Scotland salary after tax','Separate Scottish Income Tax examples where the calculation differs.'],['uk/monthly-take-home-pay','Monthly take-home pay','Understand annual-to-monthly salary conversion.'],['uk/weekly-take-home-pay','Weekly take-home pay','Convert annual salary into weekly planning numbers.'],['guides/biweekly-take-home-pay','Biweekly take-home pay','Answer two-week pay-period searches without duplicating salary pages.']])}</section>`));
+  add('uk/salary-calculator', hub('uk/salary-calculator','UK Salary Calculator | SalaryDecoded','Estimate UK salary after tax, including Income Tax, National Insurance and pension contribution examples.','UK Salary Calculator','Use the calculator for a fast UK take-home-pay estimate, then compare against selected salary guide pages.', calcBox('salaryToHourly') + `<section class="section"><h2>Selected salary guides</h2><div class="link-cloud">${ukSalaries.map(s=>a(`uk/${s}-salary`,money(s,'GBP'))).join('')} ${a('uk/scotland','Scotland salary pages')}</div></section>`));
   add('uk/salary-guides', hub('uk/salary-guides','UK Salary Guides | SalaryDecoded','Selected UK salary-after-tax examples chosen for common salary levels and tax-threshold usefulness.','UK Salary Guides','These salary pages are selected deliberately: common salaries, threshold areas and high-income examples with real calculation differences.', `<section class="section"><h2>Selected UK salaries</h2><div class="link-cloud">${ukSalaries.map(s=>a(`uk/${s}-salary`,`${money(s,'GBP')} salary`)).join('')}</div></section>`));
   add('uk/monthly-take-home-pay', hub('uk/monthly-take-home-pay','Monthly Take-Home Pay UK | SalaryDecoded','Understand monthly take-home pay from annual salary using UK tax and National Insurance assumptions.','Monthly Take-Home Pay UK','Monthly pay is often the budget number that matters most. This hub links annual salary examples to monthly take-home estimates.', `<section class="section"><h2>Monthly examples</h2>${table([['Salary','Estimated monthly take-home','Guide'],...ukSalaries.slice(4,12).map(s=>[money(s,'GBP'),money(ukCalc(s).monthly,'GBP'),a(`uk/${s}-salary`,'View guide')])])}</section>`));
   add('uk/weekly-take-home-pay', hub('uk/weekly-take-home-pay','Weekly Take-Home Pay UK | SalaryDecoded','Convert annual UK salary into estimated weekly take-home pay and payroll planning figures.','Weekly Take-Home Pay UK','Weekly estimates are useful when comparing shifts, hours and short-term budget commitments.', `<section class="section"><h2>Weekly examples</h2>${table([['Salary','Estimated weekly take-home','Guide'],...ukSalaries.slice(2,10).map(s=>[money(s,'GBP'),money(ukCalc(s).weekly,'GBP'),a(`uk/${s}-salary`,'View guide')])])}</section>`));
+  add('uk/scotland', hub('uk/scotland','Scotland Salary After Tax | SalaryDecoded','Scottish salary after tax examples using Scottish Income Tax and UK-wide National Insurance assumptions.','Scotland Salary After Tax','Scottish salary pages are included because the income-tax calculation is genuinely different from the standard UK salary pages.', `<section class="section"><h2>Selected Scottish salaries</h2><div class="link-cloud">${scotlandSalaries.map(s=>a(`uk/scotland/${s}-salary`,`${money(s,'GBP')} Scotland`)).join('')}</div></section><section class="section"><h2>Compare with standard UK pages</h2><p>Use ${a('uk/salary-guides','UK salary guides')} for England, Wales and Northern Ireland assumptions, or read ${a('guides/uk-salary-bands-explained','UK salary bands explained')} for threshold context.</p></section>`));
   for (const s of ukSalaries) add(`uk/${s}-salary`, ukSalaryPage(s));
-  add('us', hub('us','US Salary and Take-Home Pay | SalaryDecoded','US salary calculators, national salary examples and selected state salary guides.','US Salary and Take-Home Pay','Estimate federal tax, FICA, monthly pay, weekly pay and selected state-tax differences.', `<section class="section"><h2>US calculator routes</h2>${cards([['us/salary-calculator','US salary calculator','Estimate federal tax and FICA.'],['us/salary-guides','US salary guides','Selected national salary examples.'],['us/state-salary-guides','State salary guides','Selected state examples where geography changes the answer.']])}</section>`));
+  for (const s of scotlandSalaries) add(`uk/scotland/${s}-salary`, scotlandSalaryPage(s));
+  add('us', hub('us','US Salary and Take-Home Pay | SalaryDecoded','US salary calculators, national salary examples and selected state salary guides.','US Salary and Take-Home Pay','Estimate federal tax, FICA, monthly pay, weekly pay and selected state-tax differences.', `<section class="section"><h2>US calculator routes</h2>${cards([['us/salary-calculator','US salary calculator','Estimate federal tax and FICA.'],['us/salary-guides','US salary guides','Selected national salary examples.'],['us/state-salary-guides','State salary guides','Selected state examples where geography changes the answer.'],['guides/uk-vs-us-take-home-pay','UK vs US take-home pay','Understand why the two calculator systems differ.']])}</section>`));
   add('us/salary-calculator', hub('us/salary-calculator','US Salary Calculator | SalaryDecoded','Estimate US salary after federal tax and FICA, with selected state context.','US Salary Calculator','Use the calculator to estimate US take-home pay under transparent single-filer assumptions.', calcBox('salaryToHourly') + `<section class="section"><h2>Selected US salaries</h2><div class="link-cloud">${usSalaries.map(s=>a(`us/${s}-salary`,money(s,'USD'))).join('')}</div></section>`));
   add('us/salary-guides', hub('us/salary-guides','US Salary Guides | SalaryDecoded','Selected US salary-after-tax examples with federal tax, FICA and pay-period interpretation.','US Salary Guides','A small national cohort gives useful salary anchors without publishing every salary permutation.', `<section class="section"><h2>Selected national salaries</h2><div class="link-cloud">${usSalaries.map(s=>a(`us/${s}-salary`,`${money(s,'USD')} salary`)).join('')}</div></section>`));
   add('us/state-salary-guides', hub('us/state-salary-guides','State Salary Guides | SalaryDecoded','Selected US state salary examples where state tax changes take-home pay interpretation.','State Salary Guides','V1 includes only a few state pages where geography changes the calculation enough to justify separate URLs.', `<section class="section"><h2>Selected states</h2>${cards(states.map(([slug,name,desc])=>[`us/${slug}`,name,desc]))}</section>`));
@@ -329,6 +516,9 @@ function generate() {
   for (const s of usSalaries) add(`us/${s}-salary`, usSalaryPage(s));
   for (const [slug,name,salary] of statePages) add(`us/${slug}/${salary}-salary`, usSalaryPage(salary, slug, name));
   for (const [r,t,d,k] of tools) add(r, toolPage(r,t,d,k));
+  add('guides', guideHubPage());
+  for (const [r,t,d,topic] of guidePages) add(r, guidePage(r,t,d,topic));
+  for (const [aSalary,bSalary,currency,scope] of comparisonPages) add(comparisonRoute(aSalary,bSalary,currency,scope), comparisonPage(aSalary,bSalary,currency,scope));
   for (const [r,t,d] of trust) add(r, trustPage(r,t,d));
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(r=>`  <url><loc>${url(r)}</loc></url>`).join('\n')}\n</urlset>\n`;
   write('sitemap.xml', sitemap);
